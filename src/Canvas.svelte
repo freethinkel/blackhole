@@ -16,11 +16,14 @@
     ctx: CanvasRenderingContext2D,
     width: number,
     height: number,
+    iTime: number,
   ) => {
     const imgData = ctx.getImageData(0, 0, width, height);
 
+    let i = 0;
     for (let col = 0; col < height; col++) {
       for (let row = 0; row < width; row++) {
+        i += 4;
         const x = col;
         const y = row;
 
@@ -30,7 +33,8 @@
         const cx = (2 * x - w) / h;
         const cy = (2 * y - h) / h;
         let d = Math.sqrt(cx * cx + cy * cy);
-        d -= 0.5;
+        d = d;
+        d -= 0.5 * Math.sin(iTime);
         d += (0.01 * h) / (2 * (y - x) + h - w);
         d = Math.abs(d);
         if (d < 1e-6) d = 1e-6;
@@ -38,7 +42,6 @@
 
         const color = (255 * d) / (1 + d);
 
-        const i = (y * width + x) * 4;
         imgData.data[i + 0] = color;
         imgData.data[i + 1] = color * 0.6;
         imgData.data[i + 2] = 0;
@@ -49,6 +52,7 @@
     ctx.putImageData(imgData, 0, 0);
   };
 
+  let i = 0;
   const loop = () => {
     if (!isActive) {
       return;
@@ -62,7 +66,8 @@
     const height = canvasEl.height;
     const width = canvasEl.width;
 
-    drawBlackHole(ctx, width, height);
+    i = (i + 1) % width;
+    drawBlackHole(ctx, width, height, (i / width) * 4);
   };
 
   const render = () => {
